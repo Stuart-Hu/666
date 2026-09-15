@@ -81,6 +81,33 @@ select.field{appearance:none;-webkit-appearance:none;}
 textarea.field{min-height:90px;font-size:13px;resize:vertical;line-height:1.5;}
 #toast{position:fixed;left:50%;bottom:calc(96px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(16px);background:var(--kimi-color-text-primary,#1a1a1a);color:var(--kimi-color-background,#fff);padding:10px 18px;border-radius:999px;font-size:13px;opacity:0;transition:opacity .25s ease-out,transform .25s ease-out;pointer-events:none;z-index:60;max-width:82%;text-align:center;}
 #toast.on{opacity:1;transform:translateX(-50%) translateY(0);}
+.wt-day{display:flex;align-items:baseline;gap:8px;margin:22px 2px 10px;font-size:16px;font-weight:600;}
+.wt-dow{font-size:12px;font-weight:400;color:color-mix(in srgb,var(--kimi-color-text-primary,#1a1a1a) 48%,transparent);}
+.wt-date-meta{margin-left:auto;font-size:12px;font-weight:400;color:color-mix(in srgb,var(--kimi-color-text-primary,#1a1a1a) 48%,transparent);font-variant-numeric:tabular-nums;}
+.wt-move{border:1px solid color-mix(in srgb,var(--kimi-color-text-primary,#1a1a1a) 10%,transparent);border-radius:12px;padding:10px 14px;margin-bottom:8px;}
+.wt-move-head{display:flex;align-items:center;gap:8px;}
+.wt-part{font-size:11px;background:color-mix(in srgb,var(--kimi-color-positive,#0a7d3b) 12%,transparent);color:var(--kimi-color-positive,#0a7d3b);border-radius:6px;padding:2px 8px;flex:none;}
+.wt-name{font-size:15px;font-weight:500;}
+.wt-note{font-size:12px;color:color-mix(in srgb,var(--kimi-color-text-primary,#1a1a1a) 48%,transparent);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.wt-sets{font-size:12px;color:color-mix(in srgb,var(--kimi-color-text-primary,#1a1a1a) 48%,transparent);font-variant-numeric:tabular-nums;flex:none;}
+.wt-move-detail{margin-top:5px;font-size:13px;color:color-mix(in srgb,var(--kimi-color-text-primary,#1a1a1a) 66%,transparent);font-variant-numeric:tabular-nums;}
+.wt-card{border:1px solid color-mix(in srgb,var(--kimi-color-text-primary,#1a1a1a) 12%,transparent);border-radius:12px;padding:12px 14px 6px;margin-bottom:10px;}
+.wt-card-head{display:flex;align-items:center;gap:8px;margin-bottom:4px;}
+.wt-name-lg{font-size:15px;font-weight:600;}
+.wt-max{font-size:20px;font-weight:600;font-variant-numeric:tabular-nums;}
+.wt-max-u{font-size:12px;font-weight:400;color:color-mix(in srgb,var(--kimi-color-text-primary,#1a1a1a) 48%,transparent);margin-left:2px;}
+.wt-row{display:flex;align-items:center;gap:10px;padding:7px 0;border-top:1px solid color-mix(in srgb,var(--kimi-color-text-primary,#1a1a1a) 6%,transparent);}
+.wt-date{width:44px;font-size:12px;color:color-mix(in srgb,var(--kimi-color-text-primary,#1a1a1a) 48%,transparent);flex:none;font-variant-numeric:tabular-nums;}
+.wt-bar{flex:1;height:10px;border-radius:999px;background:color-mix(in srgb,var(--kimi-color-text-primary,#1a1a1a) 8%,transparent);overflow:hidden;}
+.wt-bar>div{height:100%;border-radius:999px;background:var(--kimi-color-text-primary,#1a1a1a);}
+.wt-bar>div.bodyw{background:var(--kimi-color-accent,#2f6bff);}
+.wt-w{width:58px;text-align:right;font-size:14px;font-weight:600;font-variant-numeric:tabular-nums;flex:none;}
+.wt-r{width:44px;text-align:right;font-size:12px;color:color-mix(in srgb,var(--kimi-color-text-primary,#1a1a1a) 48%,transparent);font-variant-numeric:tabular-nums;flex:none;}
+#w-range{flex-wrap:nowrap !important;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding-bottom:2px;}
+#w-range::-webkit-scrollbar{display:none;}
+#w-range .chip{flex:none;white-space:nowrap;}
+
+
 </style>
 </head>
 <body>
@@ -131,6 +158,7 @@ textarea.field{min-height:90px;font-size:13px;resize:vertical;line-height:1.5;}
           <button class="chip" data-cat="S">特殊事件</button>
         </div>
         <div class="actions">
+          <input class="field num" id="h-date" type="date" style="width:142px;padding:9px 8px;font-size:13px;">
           <button class="btn primary" id="h-confirm" style="flex:1;">确认记录</button>
           <button class="linklike" id="h-cancel">收起</button>
         </div>
@@ -141,6 +169,7 @@ textarea.field{min-height:90px;font-size:13px;resize:vertical;line-height:1.5;}
           <input class="field" id="h-avoid-note" type="text" placeholder="想买的什么" style="flex:2;">
         </div>
         <div class="actions">
+          <input class="field num" id="h-avoid-date" type="date" style="width:142px;padding:9px 8px;font-size:13px;">
           <button class="btn primary" id="h-avoid-confirm" style="flex:1;">记录这次忍住</button>
           <button class="linklike" id="h-avoid-cancel">收起</button>
         </div>
@@ -186,7 +215,7 @@ textarea.field{min-height:90px;font-size:13px;resize:vertical;line-height:1.5;}
       <div class="cardhead"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
 <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2.1001C6.53222 2.1001 2.09998 6.53234 2.09998 12.0001C2.09998 17.4679 6.53222 21.9001 12 21.9001C17.4677 21.9001 21.9 17.4679 21.9 12.0001C21.9 6.53234 17.4677 2.1001 12 2.1001ZM3.89998 12.0001C3.89998 7.52645 7.52633 3.9001 12 3.9001C16.4736 3.9001 20.1 7.52645 20.1 12.0001C20.1 16.4737 16.4736 20.1001 12 20.1001C7.52633 20.1001 3.89998 16.4737 3.89998 12.0001Z" fill="currentColor"/>
 <path d="M16.5364 10.4001C16.8879 10.7516 16.8879 11.3214 16.5364 11.6729C16.1849 12.0244 15.6151 12.0244 15.2636 11.6729L12.9 9.30933V16.3365C12.9 16.8335 12.4971 17.2365 12 17.2365C11.503 17.2365 11.1 16.8335 11.1 16.3365V9.30933L8.73641 11.6729C8.38494 12.0244 7.81509 12.0244 7.46362 11.6729C7.11214 11.3214 7.11214 10.7516 7.46362 10.4001L11.3636 6.50012C11.7151 6.14863 12.2849 6.14863 12.6364 6.50012L16.5364 10.4001Z" fill="currentColor"/>
-</svg><span>记一条</span><span class="spacer"></span><span class="meta" id="w-date"></span></div>
+</svg><span>记一条</span><span class="spacer"></span><input class="field num" id="w-date" type="date" style="width:158px;padding:5px 10px;font-size:13px;"></div>
       <div class="meta" style="margin:10px 0 6px;">部位</div>
       <div class="chips" id="w-parts"></div>
       <div style="display:flex;gap:8px;margin-top:12px;">
@@ -207,12 +236,38 @@ textarea.field{min-height:90px;font-size:13px;resize:vertical;line-height:1.5;}
     </section>
     <div class="statgrid" id="w-stats"></div>
     <h1>最近记录</h1>
+    <select class="field num" id="w-range-sel" style="margin-bottom:12px;">
+      <option value="all">全部时间</option>
+      <option value="0">今天</option>
+      <option value="7">最近 7 天</option>
+      <option value="30">最近 30 天</option>
+      <option value="90">最近 90 天</option>
+      <option value="180">最近 180 天</option>
+      <option value="365">最近一年</option>
+    </select>
+    <div class="chips" id="w-view" style="margin-bottom:12px;">
+      <button class="chip on" data-v="day">按日期</button>
+      <button class="chip" data-v="move">按动作对比</button>
+    </div>
     <div id="w-list"></div>
   </div>
 
-  <!-- 历史 -->
-  <div class="view" id="view-history">
-    <h1>历史记录</h1>
+  <!-- 消费 -->
+  <div class="view" id="view-consume">
+    <h1>消费记录</h1>
+    <section class="card" style="padding:12px 16px;">
+      <div class="row" style="justify-content:space-between;align-items:baseline;">
+        <span style="font-size:14px;font-weight:500;" id="c-title">—</span>
+        <span class="meta num" id="c-day">—</span>
+      </div>
+      <div class="row" style="margin-top:6px;">
+        <span class="num" style="font-size:22px;font-weight:500;" id="c-spent">¥0</span>
+        <span class="mut num" id="c-budget"></span>
+        <span class="spacer"></span>
+        <span class="meta num" id="c-vio"></span>
+      </div>
+      <div class="track" style="margin:8px 0 0;"><div class="fill" id="c-bar" style="width:0%;"></div></div>
+    </section>
     <div class="statgrid" id="y-stats"></div>
     <div style="position:relative;margin-bottom:12px;">
       <span style="position:absolute;left:12px;top:11px;color:color-mix(in srgb,var(--kimi-color-text-primary,#1a1a1a) 40%,transparent);display:flex;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -248,6 +303,17 @@ textarea.field{min-height:90px;font-size:13px;resize:vertical;line-height:1.5;}
   <!-- 设置 -->
   <div class="view" id="view-settings">
     <h1>设置</h1>
+    <section class="card">
+      <div class="cardhead"><svg class="ico" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path fill-rule="evenodd" clip-rule="evenodd" d="M12.0996 2C14.1963 2.00002 16.1125 2.3224 17.5371 2.87402C18.2464 3.1487 18.8793 3.49843 19.3506 3.93164C19.8228 4.36576 20.2 4.95206 20.2002 5.66895V13.9688L20.1992 13.9736L20.2002 13.9785V18.1318C20.2 18.8486 19.8228 19.4351 19.3506 19.8691C18.8793 20.3023 18.2464 20.6521 17.5371 20.9268C16.1125 21.4784 14.1963 21.8008 12.0996 21.8008C10.0032 21.8008 8.08759 21.4782 6.66309 20.9268C5.95381 20.6521 5.31994 20.3023 4.84863 19.8691C4.37651 19.4351 4.00024 18.8486 4 18.1318V5.66895C4.00015 4.95211 4.37645 4.36575 4.84863 3.93164C5.31995 3.49842 5.95375 3.14869 6.66309 2.87402C8.0876 2.32255 10.0032 2.00002 12.0996 2ZM18.3994 16.334C18.0221 16.5423 17.6065 16.7295 17.1748 16.8955C17.1589 16.9016 17.1422 16.9069 17.126 16.9121C15.7376 17.357 14.0605 17.6474 12.0996 17.6475C10.1387 17.6474 8.46166 17.357 7.07324 16.9121C7.05707 16.9069 7.04028 16.9016 7.02441 16.8955C6.59274 16.7295 6.17711 16.5422 5.7998 16.334V18.1318C5.80001 18.1769 5.82098 18.3174 6.06738 18.5439C6.31607 18.7724 6.72644 19.0211 7.3125 19.248C8.47983 19.7 10.1647 20 12.0996 20C14.0346 20 15.7194 19.7 16.8867 19.248C17.4732 19.021 17.8841 18.7725 18.1328 18.5439C18.3791 18.3175 18.3992 18.1769 18.3994 18.1318V16.334ZM18.3994 12.1797C18.022 12.3877 17.6065 12.5742 17.1748 12.7402C17.1589 12.7464 17.1422 12.7526 17.126 12.7578C15.7376 13.2027 14.0605 13.4931 12.0996 13.4932C10.1386 13.4931 8.46168 13.2027 7.07324 12.7578C7.05701 12.7526 7.04033 12.7464 7.02441 12.7402C6.93246 12.7049 6.84129 12.668 6.75098 12.6309C6.41025 12.5006 6.09127 12.359 5.7998 12.2041V13.9688C5.79995 13.99 5.81136 14.1397 6.14648 14.4082C6.47147 14.6685 6.9801 14.9371 7.65332 15.1973C8.85133 15.5775 10.3321 15.8369 12.0996 15.8369C13.8675 15.8369 15.3487 15.5777 16.5469 15.1973C17.2198 14.9372 17.7278 14.6684 18.0527 14.4082C18.3879 14.1397 18.3993 13.99 18.3994 13.9688V12.1797ZM18.3369 8.05859C18.2832 8.08757 18.229 8.11644 18.1738 8.14453C18.1338 8.16498 18.0934 8.18507 18.0527 8.20508C18.0069 8.22751 17.9607 8.24963 17.9141 8.27148C17.8598 8.29706 17.8053 8.32283 17.75 8.34766C17.7267 8.35804 17.7031 8.36768 17.6797 8.37793C17.5146 8.45061 17.3464 8.5219 17.1748 8.58789C17.159 8.59398 17.1422 8.59931 17.126 8.60449C15.7376 9.04937 14.0605 9.33983 12.0996 9.33984C10.1386 9.33982 8.46169 9.0494 7.07324 8.60449C7.05701 8.59929 7.04033 8.594 7.02441 8.58789C7.00934 8.58209 6.99453 8.57518 6.97949 8.56934C6.55215 8.41696 6.15554 8.24768 5.7998 8.05859V9.81543L5.80273 9.84473C5.81281 9.89717 5.86573 10.0387 6.14648 10.2637C6.44536 10.5031 6.90037 10.7469 7.49512 10.9873C7.54316 11.005 7.59229 11.0234 7.64258 11.041C8.84246 11.4231 10.3269 11.6846 12.0996 11.6846C13.8675 11.6846 15.3487 11.4244 16.5469 11.0439C17.2199 10.7838 17.7279 10.5151 18.0527 10.2549C18.3054 10.0525 18.374 9.91761 18.3926 9.85449L18.3994 9.81543V8.02637C18.379 8.03763 18.3575 8.04745 18.3369 8.05859ZM12.0996 3.80078C10.1646 3.8008 8.47983 4.10077 7.3125 4.55273C6.72634 4.77972 6.31605 5.02836 6.06738 5.25684C5.82051 5.48379 5.79896 5.62415 5.79883 5.66895L5.7998 5.6709C5.7998 5.69038 5.80899 5.83993 6.14648 6.11035C6.46924 6.3689 6.97318 6.63502 7.63965 6.89355C8.84008 7.27622 10.3253 7.53807 12.0996 7.53809C13.8675 7.53807 15.3487 7.27788 16.5469 6.89746C17.2198 6.63734 17.7279 6.36863 18.0527 6.1084C18.3901 5.83802 18.3994 5.68843 18.3994 5.66895C18.3993 5.62416 18.3795 5.48371 18.1328 5.25684C17.8842 5.02826 17.4732 4.77984 16.8867 4.55273C15.7194 4.10075 14.0346 3.8008 12.0996 3.80078Z" fill="currentColor"/>
+</svg><span>当前挑战预算</span></div>
+      <div class="meta" style="margin-top:10px;line-height:1.6;">规则永远锁死；预算是你自己的标尺，随时可以调，立即生效。</div>
+      <div style="display:flex;gap:8px;margin-top:10px;">
+        <input class="field num" id="g-budget" type="text" inputmode="numeric" style="flex:1;">
+        <button class="btn primary" id="g-budget-save">保存</button>
+      </div>
+    </section>
+
     <section class="card">
       <div class="cardhead"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
 <path d="M21.06 17.32C21.28 17.59 21.325 17.961 21.175 18.275C21.1003 18.4291 20.9836 18.559 20.8384 18.6497C20.6931 18.7405 20.5253 18.7884 20.354 18.788H15.822C15.6401 19.6667 15.1608 20.4558 14.465 21.0223C13.7692 21.5888 12.8993 21.8982 12.002 21.8982C11.1047 21.8982 10.2348 21.5888 9.53899 21.0223C8.84316 20.4558 8.3639 19.6667 8.182 18.788H3.784C3.63174 18.8138 3.47539 18.8001 3.33 18.748C3.15387 18.6867 3.00114 18.5721 2.89294 18.4202C2.78473 18.2683 2.7264 18.0865 2.726 17.9V17.888C2.7264 17.7648 2.75208 17.6431 2.80145 17.5302C2.85082 17.4174 2.92282 17.3159 3.013 17.232L3.259 16.934L3.26 16.932C4.163 15.828 4.683 14.372 4.683 12.852V9.674C4.723 7.645 5.457 5.729 6.76 4.287C8.071 2.826 9.841 2 11.732 2H12.27C16.27 2 19.33 5.643 19.33 9.861V13.044C19.377 14.498 19.886 15.875 20.743 16.935L20.745 16.937L21.06 17.32ZM8.12 5.483L8.117 5.486C7.124 6.584 6.537 8.077 6.502 9.7V12.85C6.502 14.317 6.12 15.75 5.414 16.987H18.594C17.9177 15.7851 17.5462 14.4357 17.512 13.057V9.86C17.512 6.403 15.046 3.799 12.27 3.799H11.732C10.396 3.799 9.109 4.378 8.12 5.483ZM13.949 18.787H10.055C10.2118 19.1749 10.4809 19.5072 10.8278 19.7412C11.1747 19.9751 11.5836 20.1001 12.002 20.1001C12.4204 20.1001 12.8293 19.9751 13.1762 19.7412C13.5231 19.5072 13.7922 19.1749 13.949 18.787Z" fill="currentColor"/>
@@ -293,7 +359,7 @@ textarea.field{min-height:90px;font-size:13px;resize:vertical;line-height:1.5;}
         违规不终止挑战；已记录的数据不可修改、不可删除。
       </div>
     </section>
-    <div class="meta" style="text-align:center;margin-top:16px;">自律挑战 v4 · 数据只存在本机</div>
+    <div class="meta" style="text-align:center;margin-top:16px;">自律挑战 v9 · 数据只存在本机</div>
   </div>
 
 </div>
@@ -307,10 +373,10 @@ textarea.field{min-height:90px;font-size:13px;resize:vertical;line-height:1.5;}
 <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2.1001C6.53222 2.1001 2.09998 6.53234 2.09998 12.0001C2.09998 17.4679 6.53222 21.9001 12 21.9001C17.4677 21.9001 21.9 17.4679 21.9 12.0001C21.9 6.53234 17.4677 2.1001 12 2.1001ZM3.89998 12.0001C3.89998 7.52645 7.52633 3.9001 12 3.9001C16.4736 3.9001 20.1 7.52645 20.1 12.0001C20.1 16.4737 16.4736 20.1001 12 20.1001C7.52633 20.1001 3.89998 16.4737 3.89998 12.0001Z" fill="currentColor"/>
 <path d="M16.5364 10.4001C16.8879 10.7516 16.8879 11.3214 16.5364 11.6729C16.1849 12.0244 15.6151 12.0244 15.2636 11.6729L12.9 9.30933V16.3365C12.9 16.8335 12.4971 17.2365 12 17.2365C11.503 17.2365 11.1 16.8335 11.1 16.3365V9.30933L8.73641 11.6729C8.38494 12.0244 7.81509 12.0244 7.46362 11.6729C7.11214 11.3214 7.11214 10.7516 7.46362 10.4001L11.3636 6.50012C11.7151 6.14863 12.2849 6.14863 12.6364 6.50012L16.5364 10.4001Z" fill="currentColor"/>
 </svg><span>训练</span></button>
-  <button class="tab" data-view="view-history"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <button class="tab" data-view="view-consume"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
 <path d="M11.8999 6.79965C12.397 6.79965 12.7997 7.20235 12.7997 7.69941V11.7266L14.7359 13.6629C15.0873 14.0143 15.0879 14.584 14.7366 14.9355C14.3852 15.287 13.8148 15.287 13.4633 14.9355L11.2632 12.7355C11.0947 12.5668 11.0002 12.338 11.0001 12.0995V7.69941C11.0001 7.20238 11.4029 6.7997 11.8999 6.79965Z" fill="currentColor"/>
 <path fill-rule="evenodd" clip-rule="evenodd" d="M12 1.89893C17.4677 1.89893 21.9001 6.33147 21.9002 11.7991C21.9002 17.2669 17.4678 21.6993 12 21.6993C6.53228 21.6993 2.09985 17.2669 2.09985 11.7991C2.09998 6.33147 6.53236 1.89893 12 1.89893ZM20.1 11.7998C20.1 7.32616 16.4737 3.69984 12 3.69984C7.5264 3.69984 3.90008 7.32616 3.90008 11.7998C3.90032 16.2732 7.52655 19.8998 12 19.8998C16.4735 19.8998 20.0998 16.2732 20.1 11.7998Z" fill="currentColor"/>
-</svg><span>历史</span></button>
+</svg><span>消费</span></button>
   <button class="tab" data-view="view-summary"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
 <path d="M4 3.08496C4.55224 3.08496 4.99993 3.53273 5 4.08496V18.0361H19.9941L20.0967 18.041C20.6008 18.0923 20.9941 18.5185 20.9941 19.0361C20.9941 19.5538 20.6008 19.9799 20.0967 20.0312L19.9941 20.0361H5C3.89546 20.0361 3.00005 19.1407 3 18.0361V4.08496C3.00007 3.53273 3.44776 3.08496 4 3.08496ZM18.2627 6.5166C18.6316 6.10561 19.2638 6.07157 19.6748 6.44043C20.0858 6.80932 20.1198 7.44153 19.751 7.85254L15.8682 12.1787C15.1552 12.9731 13.9437 13.0678 13.1162 12.3936L10.9121 10.5967L7.45117 14.6602C7.09308 15.0805 6.46145 15.1315 6.04102 14.7734C5.6206 14.4153 5.56969 13.7837 5.92773 13.3633L9.38965 9.2998C10.0949 8.47222 11.3318 8.36 12.1748 9.04688L14.3799 10.8428L18.2627 6.5166Z" fill="currentColor"/>
 </svg><span>总结</span></button>
@@ -351,7 +417,7 @@ textarea.field{min-height:90px;font-size:13px;resize:vertical;line-height:1.5;}
   var S = load();
   if (!S) S = { v:3, ch:null, records:[], workouts:[], archives:[], settings:{cycle:14, anchor:'2026-09-23'} };
   if (!S.ch){
-    S.ch = { id:'2026-09', title:'9月消费挑战', start:'2026-09-01', end:'2026-09-30', budget:3000, archived:false, train:'背' };
+    S.ch = { id:'2026-09', title:'9月消费挑战', start:'2026-09-01', end:'2026-09-30', budget:1000, archived:false, train:'背' };
   }
   // v1 迁移：logs/avoided -> records
   if (S.ch.logs || S.ch.avoided){
@@ -370,8 +436,9 @@ textarea.field{min-height:90px;font-size:13px;resize:vertical;line-height:1.5;}
   });
   S.archives = S.archives || [];
   S.settings = S.settings || {cycle:14, anchor:'2026-09-23'};
-  S.v=4; save();
+  S.v=9; save();
   var C = S.ch;
+  if (C.budget===3000) C.budget=1000;
 
   var IC = {
     A:'<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="color:var(--kimi-color-positive,#0a7d3b);"><path d="M19.3027 5.9053C19.6542 5.55397 20.2247 5.55388 20.5761 5.9053C20.9273 6.25675 20.9273 6.82734 20.5761 7.17874L9.65911 18.0948C9.30773 18.4461 8.73814 18.446 8.38665 18.0948L3.42376 13.1328C3.07242 12.7814 3.07242 12.2109 3.42376 11.8596C3.77517 11.5082 4.34571 11.5083 4.69706 11.8596L9.02288 16.1854L19.3027 5.9053Z" fill="currentColor"/></svg>',
@@ -404,8 +471,14 @@ textarea.field{min-height:90px;font-size:13px;resize:vertical;line-height:1.5;}
     }
   }
 
-  function addRecord(type, amt, note){
-    S.records.push({id:'r'+Date.now()+Math.random().toString(36).slice(2,6), ts:Date.now(), type:type, amt:Math.round(amt*100)/100, note:note});
+  function calcTs(dv){
+    if(!dv) return Date.now();
+    var n=new Date();
+    var ts=new Date(dv+'T'+pad(n.getHours())+':'+pad(n.getMinutes())+':'+pad(n.getSeconds())).getTime();
+    return Math.min(ts, Date.now());
+  }
+  function addRecord(type, amt, note, ts){
+    S.records.push({id:'r'+Date.now()+Math.random().toString(36).slice(2,6), ts:ts||Date.now(), type:type, amt:Math.round(amt*100)/100, note:note});
     save();
   }
 
@@ -415,7 +488,7 @@ textarea.field{min-height:90px;font-size:13px;resize:vertical;line-height:1.5;}
     $$('.tab').forEach(function(t){t.classList.toggle('on', t.dataset.view===v);});
     window.scrollTo(0,0);
     if (v==='view-workout') renderWorkout();
-    if (v==='view-history') renderHistory();
+    if (v==='view-consume'){ renderConsumeSummary(); renderConsume(); }
     if (v==='view-summary') renderSummary();
     if (v==='view-settings') renderSettings();
   }
@@ -424,6 +497,8 @@ textarea.field{min-height:90px;font-size:13px;resize:vertical;line-height:1.5;}
   /* ---- 首页 ---- */
   function renderHome(){
     maybeArchive();
+    if(!$('#h-date').value) $('#h-date').value=ymd(new Date());
+    if(!$('#h-avoid-date').value) $('#h-avoid-date').value=ymd(new Date());
     var spent=curSpend();
     $('#h-title').textContent=C.title;
     $('#h-range').textContent=C.start.replace(/-/g,'/')+' – '+C.end.replace(/-/g,'/');
@@ -452,6 +527,7 @@ textarea.field{min-height:90px;font-size:13px;resize:vertical;line-height:1.5;}
     $('#h-cheat-sub').textContent='非放纵日控制总量与冲动性进食；日期和周期在「设置」里自己定。';
 
     renderToday(ci.left===0);
+    renderConsumeSummary();
   }
   function recRow(l){
     var row=document.createElement('div'); row.className='rec';
@@ -505,7 +581,7 @@ textarea.field{min-height:90px;font-size:13px;resize:vertical;line-height:1.5;}
   $('#h-confirm').onclick=function(){
     var amt=parseFloat($('#h-amt').value);
     if(!(amt>0)){toast('请输入有效金额');$('#h-amt').focus();return;}
-    addRecord(picked, amt, $('#h-note').value.trim());
+    addRecord(picked, amt, $('#h-note').value.trim(), calcTs($('#h-date').value));
     $('#h-amt').value='';$('#h-note').value='';
     $('#h-form').classList.remove('open');
     renderHome();
@@ -520,7 +596,7 @@ textarea.field{min-height:90px;font-size:13px;resize:vertical;line-height:1.5;}
   $('#h-avoid-confirm').onclick=function(){
     var amt=parseFloat($('#h-avoid-amt').value);
     if(!(amt>0)){toast('请输入有效金额');$('#h-avoid-amt').focus();return;}
-    addRecord('V', amt, $('#h-avoid-note').value.trim());
+    addRecord('V', amt, $('#h-avoid-note').value.trim(), calcTs($('#h-avoid-date').value));
     $('#h-avoid-amt').value='';$('#h-avoid-note').value='';
     $('#h-avoidform').classList.remove('open');
     renderHome();
@@ -528,10 +604,12 @@ textarea.field{min-height:90px;font-size:13px;resize:vertical;line-height:1.5;}
   };
 
   /* ---- 训练 ---- */
-  var PARTS=['胸','背','肩','腿','手臂','核心','有氧','其他'];
+  var wRange='all';
+  var wView='day';
+  var PARTS=['胸','背','肩','腿','臀','手臂','核心','有氧','其他'];
   var wPicked='背';
   function renderWorkout(){
-    $('#w-date').textContent=ymd(new Date()).replace(/-/g,'/');
+    if(!$('#w-date').value) $('#w-date').value=ymd(new Date());
     var pbox=$('#w-parts'); pbox.innerHTML='';
     PARTS.forEach(function(p){
       var b=document.createElement('button'); b.className='chip'+(p===wPicked?' on':''); b.textContent=p;
@@ -549,27 +627,79 @@ textarea.field{min-height:90px;font-size:13px;resize:vertical;line-height:1.5;}
       stat('累计动作', S.workouts.length+' 条')+
       stat('累计组数', gAll+' 组');
 
-    var list=S.workouts.slice().sort(function(a,b){return b.ts-a.ts;}).slice(0,60);
+    var list=S.workouts.slice().sort(function(a,b){return b.ts-a.ts;});
+    if (wRange!=='all'){
+      if (wRange==='0'){
+        var t0=sod(new Date()).getTime();
+        list=list.filter(function(w){return sod(new Date(w.ts)).getTime()===t0;});
+      } else {
+        var lim=Date.now()-Number(wRange)*DAY;
+        list=list.filter(function(w){return w.ts>=lim;});
+      }
+    }
+    list=list.slice(0,80);
     var box=$('#w-list'); box.innerHTML='';
-    if (!list.length){ box.innerHTML='<div class="mut" style="padding:24px 0;text-align:center;">还没有训练记录，记一条吧</div>'; return; }
-    var lastKey=null;
+    if (!list.length){ box.innerHTML='<div class="mut" style="padding:24px 0;text-align:center;">'+(wRange==='0'?'今天还没有训练记录':'该时间段还没有训练记录')+'</div>'; return; }
+
+    if (wView==='move'){
+      var groups={}, order=[];
+      list.forEach(function(w){
+        if(!groups[w.name]){ groups[w.name]={part:w.part, items:[]}; order.push(w.name); }
+        if(groups[w.name].items.length<8) groups[w.name].items.push(w);
+      });
+      order.sort(function(a,b){ return groups[b].items[0].ts - groups[a].items[0].ts; });
+      order.forEach(function(name){
+        var g=groups[name];
+        var maxW=0;
+        g.items.forEach(function(w){ (w.sets||[]).forEach(function(s){ if(s.w>maxW)maxW=s.w; }); });
+        var card=document.createElement('div'); card.className='wt-card';
+        card.innerHTML='<div class="wt-card-head"><span class="wt-part">'+esc(g.part)+'</span><span class="wt-name-lg">'+esc(name)+'</span><span class="spacer"></span><span class="wt-max">'+(maxW>0?maxW:'自重')+(maxW>0?'<span class="wt-max-u">kg</span>':'')+'</span></div>';
+        g.items.forEach(function(w){
+          var setMax=0, totalR=0;
+          (w.sets||[]).forEach(function(s){ if(s.w>setMax)setMax=s.w; totalR+=s.r; });
+          var d=new Date(w.ts);
+          var barW=maxW>0?Math.max(6,Math.round(setMax/maxW*100)):6;
+          var row=document.createElement('div'); row.className='wt-row';
+          row.innerHTML='<span class="wt-date">'+(d.getMonth()+1)+'/'+d.getDate()+'</span>'
+            +'<div class="wt-bar"><div class="'+(setMax>0?'':'bodyw')+'" style="width:'+barW+'%"></div></div>'
+            +'<span class="wt-w">'+(setMax>0?setMax+'kg':'自重')+'</span>'
+            +'<span class="wt-r">'+totalR+'次</span>';
+          card.appendChild(row);
+        });
+        box.appendChild(card);
+      });
+      return;
+    }
+
+    var WEEK=['日','一','二','三','四','五','六'];
+    var lastDay=null, dayStats=null;
     list.forEach(function(w){
       var d=new Date(w.ts);
-      var key=d.getFullYear()+'年'+(d.getMonth()+1)+'月';
-      if (key!==lastKey){ var gt=document.createElement('div'); gt.className='grouptitle'; gt.textContent=key; box.appendChild(gt); lastKey=key; }
-      var row=document.createElement('div'); row.className='rec'; row.style.flexWrap='wrap';
+      var dayKey=sod(d).getTime();
+      if (dayKey!==lastDay){
+        dayStats={moves:0, sets:0};
+        var head=document.createElement('div'); head.className='wt-day';
+        head.innerHTML='<span>'+(d.getMonth()+1)+'月'+d.getDate()+'日</span><span class="wt-dow">周'+WEEK[d.getDay()]+'</span><span class="wt-date-meta" id="dmt-'+dayKey+'"></span>';
+        box.appendChild(head);
+        lastDay=dayKey;
+      }
+      dayStats.moves++;
       var sets=w.sets||[];
+      dayStats.sets+=sets.length;
       var setStr=sets.map(function(s){return (s.w>0?s.w+'kg':'自重')+'×'+s.r;}).join(' · ');
       var totalReps=sets.reduce(function(a,s){return a+s.r;},0);
-      row.innerHTML='<span class="pos" style="font-size:12px;border:1px solid color-mix(in srgb,var(--kimi-color-positive,#0a7d3b) 40%,transparent);border-radius:6px;padding:1px 6px;">'+esc(w.part)+'</span>'
-        +'<span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+esc(w.name)+(w.note?' <span class="meta">'+esc(w.note)+'</span>':'')+'</span>'
-        +'<span class="meta num">'+dstr(w.ts)+' · '+sets.length+' 组</span>'
-        +'<div class="mut num" style="width:100%;font-size:12px;padding-top:2px;">'+setStr+' · 共 '+totalReps+' 次</div>';
+      var row=document.createElement('div'); row.className='wt-move';
+      row.innerHTML='<div class="wt-move-head"><span class="wt-part">'+esc(w.part)+'</span><span class="wt-name">'+esc(w.name)+'</span>'
+        +(w.note?'<span class="wt-note">'+esc(w.note)+'</span>':'')
+        +'<span class="spacer"></span><span class="wt-sets">'+sets.length+' 组 · 共'+totalReps+'次</span></div>'
+        +'<div class="wt-move-detail">'+setStr+'</div>';
       box.appendChild(row);
+      var metaEl=document.getElementById('dmt-'+dayKey);
+      if (metaEl) metaEl.textContent=dayStats.moves+' 个动作 · '+dayStats.sets+' 组';
     });
-    if (S.workouts.length>60){
+    if (S.workouts.length>80){
       var more=document.createElement('div'); more.className='meta'; more.style.textAlign='center'; more.style.margin='12px 0';
-      more.textContent='仅显示最近 60 条，完整数据在导出文件里'; box.appendChild(more);
+      more.textContent='仅显示最近 80 条动作，完整数据在导出文件里'; box.appendChild(more);
     }
   }
   function stat(k,v){ return '<div class="stat"><div class="k">'+k+'</div><div class="v num">'+v+'</div></div>'; }
@@ -597,13 +727,32 @@ textarea.field{min-height:90px;font-size:13px;resize:vertical;line-height:1.5;}
     var name=$('#w-name').value.trim();
     if(!name){toast('填一下动作名称');$('#w-name').focus();return;}
     if(!wSets.length){toast('先点「加一组」再保存');return;}
-    S.workouts.push({id:'w'+Date.now()+Math.random().toString(36).slice(2,6), ts:Date.now(), part:wPicked, name:name, sets:wSets.slice(), note:$('#w-note').value.trim()});
+    var dv=$('#w-date').value, nowD=new Date();
+    var ts=dv ? new Date(dv+'T'+pad(nowD.getHours())+':'+pad(nowD.getMinutes())+':'+pad(nowD.getSeconds())).getTime() : Date.now();
+    if (ts>Date.now()+60000){ toast('日期不能晚于今天'); return; }
+    S.workouts.push({id:'w'+Date.now()+Math.random().toString(36).slice(2,6), ts:ts, part:wPicked, name:name, sets:wSets.slice(), note:$('#w-note').value.trim()});
     save();
     wSets=[]; $('#w-name').value='';$('#w-note').value='';
     renderCurSets(); renderWorkout(); renderToday(cheatInfo().left===0);
     flashBtn(this,'已保存 ✓');
     setTimeout(function(){$('#w-name').focus();},200);
   };
+  document.addEventListener('click', function(e){
+    var b=e.target.closest && e.target.closest('#w-range .chip');
+    if(b){
+      wRange=b.dataset.d;
+      $$('#w-range .chip').forEach(function(c){c.classList.toggle('on',c===b);});
+      renderWorkout();
+      return;
+    }
+    var v=e.target.closest && e.target.closest('#w-view .chip');
+    if(v){
+      wView=v.dataset.v;
+      $$('#w-view .chip').forEach(function(c){c.classList.toggle('on',c===v);});
+      renderWorkout();
+    }
+  });
+  $('#w-range-sel').addEventListener('change', function(){ wRange=this.value; renderWorkout(); });
 
   /* ---- 历史 ---- */
   var yFilter={f:'all', q:'', year:'all', month:'all'};
@@ -616,7 +765,19 @@ textarea.field{min-height:90px;font-size:13px;resize:vertical;line-height:1.5;}
     for (var m=1;m<=12;m++){ var o=document.createElement('option'); o.value=m; o.textContent=m+' 月'; msel.appendChild(o); }
     ysel.value=yFilter.year; msel.value=yFilter.month;
   }
-  function renderHistory(){
+  function renderConsumeSummary(){
+    var spent=curSpend(), v=curVio().length, av=curAvoid();
+    $('#c-title').textContent=C.title;
+    $('#c-day').textContent='第 '+dayNo()+' / '+total+' 天';
+    $('#c-spent').textContent=money(spent);
+    $('#c-budget').textContent='/ '+money(C.budget);
+    $('#c-vio').textContent='违规 '+v+' · 忍住 '+av.length;
+    var pct=Math.min(100,spent/C.budget*100);
+    var bar=$('#c-bar');
+    bar.style.width=pct+'%';
+    bar.style.background=spent>C.budget?'var(--kimi-color-danger,#c2402a)':(pct>=80?'var(--kimi-color-warning,#c77700)':'var(--kimi-color-text-primary,#1a1a1a)');
+  }
+  function renderConsume(){
     buildYearMonth();
     var list=S.records.filter(function(r){
       if (yFilter.f!=='all' && r.type!==yFilter.f) return false;
@@ -722,7 +883,16 @@ textarea.field{min-height:90px;font-size:13px;resize:vertical;line-height:1.5;}
   function renderSettings(){
     $('#g-anchor').value=S.settings.anchor;
     $('#g-cycle').value=S.settings.cycle;
+    $('#g-budget').value=C.budget;
   }
+  $('#g-budget-save').onclick=function(){
+    var b=parseFloat($('#g-budget').value);
+    if(!(b>0)){toast('请输入有效金额');return;}
+    C.budget=Math.round(b); save();
+    renderHome(); renderConsumeSummary();
+    flashBtn(this,'已保存 ✓');
+    toast('预算已更新为 '+money(C.budget));
+  };
   $('#g-cheat-save').onclick=function(){
     var a=$('#g-anchor').value, c=parseInt($('#g-cycle').value,10);
     if (!a){ toast('请选择下一次放纵日'); return; }
@@ -763,7 +933,7 @@ textarea.field{min-height:90px;font-size:13px;resize:vertical;line-height:1.5;}
       total=Math.round((cEnd-cStart)/DAY)+1;
       save();
       $('#g-import').value='';
-      renderHome(); renderWorkout(); renderHistory(); renderSummary(); renderSettings();
+      renderHome(); renderWorkout(); renderConsumeSummary(); renderConsume(); renderSummary(); renderSettings();
       toast('已恢复备份数据');
     }catch(e){ toast('JSON 格式不对，恢复失败'); }
   };
@@ -777,7 +947,7 @@ textarea.field{min-height:90px;font-size:13px;resize:vertical;line-height:1.5;}
     $('#installbar-x').onclick=function(){ bar.style.display='none'; try{sessionStorage.setItem('scd_install_dismissed','1');}catch(e){} };
   }
 
-  renderHome(); renderWorkout(); renderHistory(); renderSummary(); renderSettings();
+  renderHome(); renderWorkout(); renderConsumeSummary(); renderConsume(); renderSummary(); renderSettings();
 })();
 </script>
 </body>
