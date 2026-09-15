@@ -191,17 +191,19 @@ textarea.field{min-height:90px;font-size:13px;resize:vertical;line-height:1.5;}
       <div class="chips" id="w-parts"></div>
       <div style="display:flex;gap:8px;margin-top:12px;">
         <input class="field" id="w-name" type="text" placeholder="动作，如 深蹲 / 卧推" style="flex:2;">
-        <input class="field num" id="w-weight" type="text" inputmode="decimal" placeholder="kg" style="flex:1;">
-      </div>
-      <div style="display:flex;gap:8px;margin-top:8px;">
-        <input class="field num" id="w-sets" type="text" inputmode="numeric" placeholder="组数" style="flex:1;">
-        <input class="field num" id="w-reps" type="text" inputmode="numeric" placeholder="每组次数" style="flex:1;">
         <input class="field" id="w-note" type="text" placeholder="备注（可空）" style="flex:2;">
       </div>
-      <div class="actions">
-        <button class="btn primary" id="w-save" style="flex:1;">记录这条</button>
+      <div style="display:flex;gap:8px;margin-top:8px;">
+        <input class="field num" id="w-weight" type="text" inputmode="decimal" placeholder="重量 kg（自重填 0）" style="flex:2;">
+        <input class="field num" id="w-reps" type="text" inputmode="numeric" placeholder="这组几次" style="flex:1;">
+        <button class="btn" id="w-addset" style="flex:1;">加一组</button>
       </div>
-      <div class="meta" style="margin-top:8px;line-height:1.6;">保存后可直接继续记下一个动作，部位会保留。重量填 0 表示自重。</div>
+      <div id="w-curlist" style="margin-top:10px;"></div>
+      <div class="actions">
+        <button class="btn primary" id="w-save" style="flex:1;">保存这个动作</button>
+        <button class="linklike" id="w-undoset" style="display:none;">撤销上一组</button>
+      </div>
+      <div class="meta" style="margin-top:8px;line-height:1.6;">逐组记录：每组重量、次数都可以不同。保存后可直接记下一个动作，部位保留。</div>
     </section>
     <div class="statgrid" id="w-stats"></div>
     <h1>最近记录</h1>
@@ -291,7 +293,7 @@ textarea.field{min-height:90px;font-size:13px;resize:vertical;line-height:1.5;}
         违规不终止挑战；已记录的数据不可修改、不可删除。
       </div>
     </section>
-    <div class="meta" style="text-align:center;margin-top:16px;">自律挑战 v3 · 数据只存在本机</div>
+    <div class="meta" style="text-align:center;margin-top:16px;">自律挑战 v4 · 数据只存在本机</div>
   </div>
 
 </div>
@@ -359,9 +361,16 @@ textarea.field{min-height:90px;font-size:13px;resize:vertical;line-height:1.5;}
   }
   S.records = S.records || [];
   S.workouts = S.workouts || [];
+  S.workouts.forEach(function(w){
+    if (!Array.isArray(w.sets)){
+      var n=parseInt(w.sets,10)||1, arr=[];
+      for (var i=0;i<n;i++) arr.push({w:Number(w.weight)||0, r:parseInt(w.reps,10)||0});
+      w.sets=arr; delete w.weight; delete w.reps;
+    }
+  });
   S.archives = S.archives || [];
   S.settings = S.settings || {cycle:14, anchor:'2026-09-23'};
-  S.v=3; save();
+  S.v=4; save();
   var C = S.ch;
 
   var IC = {
@@ -519,7 +528,7 @@ textarea.field{min-height:90px;font-size:13px;resize:vertical;line-height:1.5;}
   };
 
   /* ---- 训练 ---- */
-  var PARTS=['胸','背','肩','腿','臀','手臂','核心','有氧','其他'];
+  var PARTS=['胸','背','肩','腿','手臂','核心','有氧','其他'];
   var wPicked='背';
   function renderWorkout(){
     $('#w-date').textContent=ymd(new Date()).replace(/-/g,'/');
@@ -529,20 +538,16 @@ textarea.field{min-height:90px;font-size:13px;resize:vertical;line-height:1.5;}
       b.onclick=function(){ wPicked=p; renderWorkout(); };
       pbox.appendChild(b);
     });
-    var now=Date.now(), nowD=new Date();
-    var week={},month={},parts={};
+    var now=Date.now(), weekD={}, gWeek=0, gAll=0;
     S.workouts.forEach(function(w){
-      if (now-w.ts<7*DAY) week[sod(new Date(w.ts)).getTime()]=1;
-      var d=new Date(w.ts);
-      if (d.getFullYear()===nowD.getFullYear()&&d.getMonth()===nowD.getMonth()) month[sod(d).getTime()]=1;
-      parts[w.part]=(parts[w.part]||0)+1;
+      var n=(w.sets||[]).length; gAll+=n;
+      if (now-w.ts<7*DAY){ weekD[sod(new Date(w.ts)).getTime()]=1; gWeek+=n; }
     });
-    var top=Object.keys(parts).sort(function(a,b){return parts[b]-parts[a];})[0]||'—';
     $('#w-stats').innerHTML=
-      stat('近 7 天训练', Object.keys(week).length+' 天')+
-      stat('本月训练', Object.keys(month).length+' 天')+
-      stat('累计动作记录', S.workouts.length+' 条')+
-      stat('最常练部位', top);
+      stat('近 7 天训练', Object.keys(weekD).length+' 天')+
+      stat('近 7 天组数', gWeek+' 组')+
+      stat('累计动作', S.workouts.length+' 条')+
+      stat('累计组数', gAll+' 组');
 
     var list=S.workouts.slice().sort(function(a,b){return b.ts-a.ts;}).slice(0,60);
     var box=$('#w-list'); box.innerHTML='';
@@ -552,11 +557,14 @@ textarea.field{min-height:90px;font-size:13px;resize:vertical;line-height:1.5;}
       var d=new Date(w.ts);
       var key=d.getFullYear()+'年'+(d.getMonth()+1)+'月';
       if (key!==lastKey){ var gt=document.createElement('div'); gt.className='grouptitle'; gt.textContent=key; box.appendChild(gt); lastKey=key; }
-      var row=document.createElement('div'); row.className='rec';
-      var nums=(w.weight>0?w.weight+'kg':'自重')+' × '+w.sets+'组 × '+w.reps+'次';
+      var row=document.createElement('div'); row.className='rec'; row.style.flexWrap='wrap';
+      var sets=w.sets||[];
+      var setStr=sets.map(function(s){return (s.w>0?s.w+'kg':'自重')+'×'+s.r;}).join(' · ');
+      var totalReps=sets.reduce(function(a,s){return a+s.r;},0);
       row.innerHTML='<span class="pos" style="font-size:12px;border:1px solid color-mix(in srgb,var(--kimi-color-positive,#0a7d3b) 40%,transparent);border-radius:6px;padding:1px 6px;">'+esc(w.part)+'</span>'
         +'<span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+esc(w.name)+(w.note?' <span class="meta">'+esc(w.note)+'</span>':'')+'</span>'
-        +'<span class="mut num">'+dstr(w.ts)+' · '+nums+'</span>';
+        +'<span class="meta num">'+dstr(w.ts)+' · '+sets.length+' 组</span>'
+        +'<div class="mut num" style="width:100%;font-size:12px;padding-top:2px;">'+setStr+' · 共 '+totalReps+' 次</div>';
       box.appendChild(row);
     });
     if (S.workouts.length>60){
@@ -565,19 +573,35 @@ textarea.field{min-height:90px;font-size:13px;resize:vertical;line-height:1.5;}
     }
   }
   function stat(k,v){ return '<div class="stat"><div class="k">'+k+'</div><div class="v num">'+v+'</div></div>'; }
+  var wSets=[];
+  function renderCurSets(){
+    var box=$('#w-curlist'); box.innerHTML='';
+    wSets.forEach(function(s,i){
+      var row=document.createElement('div'); row.className='rec';
+      row.innerHTML='<span class="meta">第 '+(i+1)+' 组</span><span class="num" style="flex:1;font-weight:500;">'+(s.w>0?s.w+'kg':'自重')+' × '+s.r+' 次</span>';
+      box.appendChild(row);
+    });
+    $('#w-undoset').style.display=wSets.length?'':'none';
+  }
+  $('#w-addset').onclick=function(){
+    var w=parseFloat($('#w-weight').value), r=parseInt($('#w-reps').value,10);
+    if(isNaN(w)||w<0){toast('重量填数字（自重填 0）');return;}
+    if(!(r>0)){toast('这组做了几次？填大于 0 的数字');$('#w-reps').focus();return;}
+    wSets.push({w:w,r:r});
+    $('#w-weight').value='';$('#w-reps').value='';
+    renderCurSets();
+    $('#w-reps').focus();
+  };
+  $('#w-undoset').onclick=function(){ wSets.pop(); renderCurSets(); };
   $('#w-save').onclick=function(){
     var name=$('#w-name').value.trim();
     if(!name){toast('填一下动作名称');$('#w-name').focus();return;}
-    var weight=parseFloat($('#w-weight').value);
-    var sets=parseInt($('#w-sets').value,10);
-    var reps=parseInt($('#w-reps').value,10);
-    if(isNaN(weight)||weight<0){toast('重量填数字（自重填 0）');$('#w-weight').focus();return;}
-    if(!(sets>0)||!(reps>0)){toast('组数和次数都要大于 0');return;}
-    S.workouts.push({id:'w'+Date.now()+Math.random().toString(36).slice(2,6), ts:Date.now(), part:wPicked, name:name, weight:weight, sets:sets, reps:reps, note:$('#w-note').value.trim()});
+    if(!wSets.length){toast('先点「加一组」再保存');return;}
+    S.workouts.push({id:'w'+Date.now()+Math.random().toString(36).slice(2,6), ts:Date.now(), part:wPicked, name:name, sets:wSets.slice(), note:$('#w-note').value.trim()});
     save();
-    $('#w-name').value='';$('#w-weight').value='';$('#w-sets').value='';$('#w-reps').value='';$('#w-note').value='';
-    renderWorkout(); renderToday(cheatInfo().left===0);
-    flashBtn(this,'已记录 ✓');
+    wSets=[]; $('#w-name').value='';$('#w-note').value='';
+    renderCurSets(); renderWorkout(); renderToday(cheatInfo().left===0);
+    flashBtn(this,'已保存 ✓');
     setTimeout(function(){$('#w-name').focus();},200);
   };
 
